@@ -22,11 +22,6 @@ class Movies extends Component {
     this.setState({ movies: getMovies(), genres });
   }
 
-  handleDelete = (movie) => {
-    const movies = this.state.movies.filter((m) => m._id !== movie._id);
-    this.setState({ movies });
-  };
-
   handleClick = (movie) => {
     const movies = [...this.state.movies];
     const index = movies.indexOf(movie);
@@ -62,7 +57,22 @@ class Movies extends Component {
 
     const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
     const movies = paginate(sorted, currentPage, pageSize);
-    return { totalCount: filtered.length, data: movies };
+
+    return {
+      totalCount: filtered.length,
+      data: movies,
+    };
+  };
+
+  handleDelete = (movie) => {
+    const movies = this.state.movies.filter((m) => m._id !== movie._id);
+    this.setState({ movies });
+
+    const { data } = this.getPagedData();
+
+    if (data.length === 1) {
+      this.setState({ currentPage: 1 });
+    }
   };
 
   render() {
@@ -87,7 +97,7 @@ class Movies extends Component {
           <MoviesTable
             movies={movies}
             sortColumn={sortColumn}
-            onLike={this.handleLike}
+            onLike={this.handleClick}
             onDelete={this.handleDelete}
             onSort={this.handleSort}
           />
